@@ -2,12 +2,14 @@ using Godot;
 using System;
 
 public class Player : KinematicBody {
-    // Constants of motion for doing physics on
-    private const int MOVE_SPEED = 5;
-    private const int JUMP_FORCE = 12;
-    private const float GRAVITY = 9.8f;
-    private const int MAX_FALL_SPEED = 30;
-
+    // Constants of motion for doing physics on... sorry for [Export] hell...
+    [Export] int MOVE_SPEED = 5;
+    [Export] int JUMP_FORCE = 12;
+    [Export] float GRAVITY = 9.8f;
+    [Export] int MAX_FALL_SPEED = 30;
+    
+    //Apparently constants can't be exported to Godot's editor... huh...
+    
     //Current velocity on the Y-Axis... obviously.
     private float y_velo = 0;
     private bool facing_right = false;
@@ -29,7 +31,7 @@ public class Player : KinematicBody {
         MoveAndSlide(new Vector3(move_dir * MOVE_SPEED, y_velo, 0), new Vector3(0, 1, 0));
         
         //Jumping code
-        var justJumped = false;
+        var justJumped = false; // Will be used for animation functionality...
         var grounded = IsOnFloor();
         y_velo -= GRAVITY * delta;
 
