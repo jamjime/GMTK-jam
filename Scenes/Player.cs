@@ -3,15 +3,16 @@ using System;
 
 public class Player : KinematicBody {
     // Constants of motion for doing physics on... sorry for [Export] hell...
-    [Export] int MOVE_SPEED = 5;
-    [Export] int JUMP_FORCE = 12;
-    [Export] float GRAVITY = 9.8f;
-    [Export] int MAX_FALL_SPEED = 30;
-    
+    [Export] private readonly float moveSpeed = 6.5f;
+    [Export] private readonly float jumpForce = 17.5f;
+    [Export] private readonly float runForce = 0.025f;
+    [Export] private readonly float gravity = 22f;
+    [Export] private readonly float maxFallSpeed = 30f;
+    [Export] private readonly float xAirDamping = 0.95f;
+    [Export] private readonly float xFloorDamping = 0.7f;
     //Apparently constants can't be exported to Godot's editor... huh...
     
-    //Current velocity on the Y-Axis... obviously.
-    private float y_velo = 0;
+    private Vector2 vel = Vector2.Zero;
     private bool facing_right = false;
     
     //TODO: Add reference to animation player for when graphics are finalised.
@@ -19,41 +20,58 @@ public class Player : KinematicBody {
 
     public override void _PhysicsProcess(float delta) {
         //Positive values of move_dir indicate a move towards the right.
-        var move_dir = 0;
+        int moveDir = 0;
 
         if (Input.IsActionPressed("move_right")) {
-            move_dir++;
+            moveDir++;
         } else if (Input.IsActionPressed("move_left")) {
-            move_dir--;
+            moveDir--;
         }
-        
-        //This just moves the player along a vector... I'm sorry for declaring the vector at runtime but whatever...
-        MoveAndSlide(new Vector3(move_dir * MOVE_SPEED, y_velo, 0), new Vector3(0, 1, 0));
+
+        if (moveDir != 0)
+            vel.x = moveDir;
         
         //Jumping code
-        var justJumped = false; // Will be used for animation functionality...
-        var grounded = IsOnFloor();
-        y_velo -= GRAVITY * delta;
-
-        if (y_velo < -MAX_FALL_SPEED) {
-            y_velo = -MAX_FALL_SPEED;
-        }
-
-        if (grounded) {
-            y_velo = -0.1f;
-            if (Input.IsActionPressed("jump")) {
-                y_velo = JUMP_FORCE;
-                justJumped = true;
-            }
+        bool justJumped = false;
+        bool grounded = IsOnFloor();
+        bool ceilinged = IsOnCeiling();
+        bool walled = IsOnWall();
+        
+        vel.y -= gravity * delta;
+        if (vel.y < -maxFallSpeed) {
+            vel.y = -maxFallSpeed;
         }
         
+        if (grounded)
+        {
+            vel.y = -0.01f;
+            if (Input.IsActionPressed("jump"))
+            {
+                justJumped = true;
+                vel.y = jumpForce;
+            }
+        }
+            
+        if (ceilinged)      // bang head on ceiling
+            vel.y = 0f;
+
+        if (walled)         // bump into wall
+            vel.x = 0f;
+
+
+        //This just moves the player along a vector... I'm sorry for declaring the vector at runtime but whatever...
+        MoveAndSlide(new Vector3(moveSpeed * vel.x, vel.y, 0), new Vector3(0, 1, 0));
+        
+        // x damping - doesn't matter what moveDir is bc this will be overwritten next call if it's != 0
+        vel.x *= grounded ? xFloorDamping : xAirDamping;
+        vel.x = (float) Math.Round(vel.x, 4);
+
         // Flip the character. Probably not useful without graphics.
         // TODO: Fix flip functionality.
-        if (move_dir < 0 && facing_right) {
+        if (moveDir < 0 && facing_right) {
             Flip();
         }
-
-        if (move_dir > 0 && !facing_right) {
+        if (moveDir > 0 && !facing_right) {
             Flip();
         }
         
