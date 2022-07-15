@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://blocks.meshlib" type="MeshLibrary" id=1]
 [ext_resource path="res://Scenes/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scenes/PausePopup.cs" type="Script" id=4]
 
 [node name="World" type="Spatial"]
 
@@ -21,3 +22,24 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.04938, 0 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.226447, 0.974023, 0, -0.974023, 0.226447, 0, 10.9055, 24.4736 )
+
+[node name="PausePopup" type="Popup" parent="."]
+pause_mode = 2
+visible = true
+margin_right = 201.0
+margin_bottom = 85.0
+script = ExtResource( 4 )
+
+[node name="ResumeButton" type="Button" parent="PausePopup"]
+margin_left = 62.0
+margin_top = 13.0
+margin_right = 139.0
+margin_bottom = 33.0
+text = "Resume"
+
+[node name="ExitButton" type="Button" parent="PausePopup"]
+margin_left = 78.0
+margin_top = 49.0
+margin_right = 189.0
+margin_bottom = 71.0
+text = "Exit To Desktop"
