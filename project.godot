@@ -15,7 +15,7 @@ _global_script_class_icons={
 
 [application]
 
-config/name="YOUR_PROJECT_NAME_HERE"
+config/name="GMTK_JAM_GAME"
 config/icon="res://icon.png"
 
 [editor_plugins]
