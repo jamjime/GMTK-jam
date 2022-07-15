@@ -2,26 +2,28 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/art.png-85512ed71244e12d4b3838264f5b2307.stex"
+path.s3tc="res://.import/art.png-85512ed71244e12d4b3838264f5b2307.s3tc.stex"
+path.etc2="res://.import/art.png-85512ed71244e12d4b3838264f5b2307.etc2.stex"
 metadata={
-"vram_texture": false
+"imported_formats": [ "s3tc", "etc2" ],
+"vram_texture": true
 }
 
 [deps]
 
 source_file="res://Assets/art.png"
-dest_files=[ "res://.import/art.png-85512ed71244e12d4b3838264f5b2307.stex" ]
+dest_files=[ "res://.import/art.png-85512ed71244e12d4b3838264f5b2307.s3tc.stex", "res://.import/art.png-85512ed71244e12d4b3838264f5b2307.etc2.stex" ]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/lossy_quality=0.7
 compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
-flags/repeat=0
+flags/repeat=true
 flags/filter=true
-flags/mipmaps=false
+flags/mipmaps=true
 flags/anisotropic=false
 flags/srgb=2
 process/fix_alpha_border=true
@@ -31,5 +33,5 @@ process/invert_color=false
 process/normal_map_invert_y=false
 stream=false
 size_limit=0
-detect_3d=true
+detect_3d=false
 svg/scale=1.0
