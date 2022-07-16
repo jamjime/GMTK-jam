@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Scenes/Dice.cs" type="Script" id=1]
+
+[sub_resource type="PhysicsMaterial" id=8]
+bounce = 0.75
+
+[sub_resource type="BoxShape" id=3]
+
+[sub_resource type="CubeMesh" id=4]
+
+[sub_resource type="Shader" id=5]
+code = "shader_type spatial;
+
+void fragment() {
+	ALBEDO = vec3(0.6, 0.2, 0.6);
+}
+"
+
+[sub_resource type="ShaderMaterial" id=6]
+shader = SubResource( 5 )
+
+[sub_resource type="BoxShape" id=7]
+extents = Vector3( 9.45058, 1, 7.86782 )
+
+[node name="Spatial" type="Spatial"]
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 0.965909, 0.0794063, -0.246403, 0.0219593, 0.923236, 0.383605, 0.257949, -0.375938, 0.890018, -2.89696, 6.90831, 11.0129 )
+
+[node name="OmniLight" type="OmniLight" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -11.7054, 7.89298, 0 )
+omni_range = 24.9211
+
+[node name="Dice" type="RigidBody" parent="."]
+transform = Transform( 0.914576, 0.0605777, -0.399851, -0.265997, 0.834858, -0.481931, 0.304625, 0.547122, 0.779655, 0, 8.43498, 0 )
+physics_material_override = SubResource( 8 )
+script = ExtResource( 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Dice"]
+shape = SubResource( 3 )
+
+[node name="DiceMesh" type="MeshInstance" parent="Dice"]
+transform = Transform( 1, 1.49012e-08, -7.45058e-09, -2.23517e-08, 1, -2.98023e-08, -7.45058e-09, -2.98023e-08, 1, 0, 0, 0 )
+mesh = SubResource( 4 )
+material/0 = SubResource( 6 )
+
+[node name="DiceTable" type="StaticBody" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.9819, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="DiceTable"]
+shape = SubResource( 7 )
