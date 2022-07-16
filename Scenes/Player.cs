@@ -5,20 +5,23 @@ public class Player : KinematicBody {
     // Modified Constant Values - I've played around with these and this
     // is what felt best to me. Feel free to modify to your liking.
     [Export] private float TARGET_FPS = 60; // Gaming moment...
-    [Export] private float ACCELERATION = 8;
-    [Export] private float MAX_SPEED = 64;
-    [Export] private float FRICTION = 10;
+    [Export] private float ACCELERATION = 4;
+    [Export] private float MAX_SPEED = 16;
+    [Export] private float FRICTION = 5;
 
     [Export]
     private float AIR_RESISTANCE = 1; // I've called this air resistance, but really it's just the stopping factor.
 
-    [Export] private float GRAVITY = -4;
-    [Export] private float JUMP_FORCE = 140;
+    [Export] private float GRAVITY = -2;
+    [Export] private float JUMP_FORCE = 35;
 
     private Vector3 motion = Vector3.Zero;
+    AnimatedSprite3D sprite; 
 
     public override void _Ready() {
         //TODO: Graphics and Sprite-work
+        sprite = GetNode<AnimatedSprite3D>("AnimatedSprite3D");
+        
     }
 
     public override void _PhysicsProcess(float delta) {
@@ -29,7 +32,10 @@ public class Player : KinematicBody {
             //TODO: Play the running animation
             motion.x += x_input * ACCELERATION * delta * TARGET_FPS;
             motion.x = Mathf.Clamp(motion.x, -MAX_SPEED, MAX_SPEED);
-            //TODO: Flip the lil guy
+            sprite.FlipH = x_input < 0; //Proud of this.
+        }
+        else {
+            sprite.Play("idle");
         }
 
         // Defining vertical motion
@@ -45,8 +51,8 @@ public class Player : KinematicBody {
             }
         }
         else {
-            // TODO: Play the jump animation
-
+            sprite.Play("jump");
+            
             // DIRTY variable-esc jumping
             if (Input.IsActionJustReleased("jump") && motion.y > JUMP_FORCE / 2) {
                 motion.y = JUMP_FORCE / 2;
