@@ -1,94 +1,61 @@
-using Godot;
 using System;
+using Godot;
 
 public class Player : KinematicBody {
-    // Constants of motion for doing physics on... sorry for [Export] hell...
-    [Export] private readonly float moveSpeed = 6.5f;
-    [Export] private readonly float jumpForce = 17.5f;
-    [Export] private readonly float runForce = 0.025f;
-    [Export] private readonly float gravity = 22f;
-    [Export] private readonly float maxFallSpeed = 30f;
-    [Export] private readonly float xAirDamping = 0.95f;
-    [Export] private readonly float xFloorDamping = 0.7f;
-    //Apparently constants can't be exported to Godot's editor... huh...
-    
-    private Vector2 vel = Vector2.Zero;
-    private bool facing_right = false;
-    
-    //TODO: Add reference to animation player for when graphics are finalised.
+    // Modified Constant Values - I've played around with these and this
+    // is what felt best to me. Feel free to modify to your liking.
+    [Export] private float TARGET_FPS = 60; // Gaming moment...
+    [Export] private float ACCELERATION = 8;
+    [Export] private float MAX_SPEED = 64;
+    [Export] private float FRICTION = 10;
 
+    [Export]
+    private float AIR_RESISTANCE = 1; // I've called this air resistance, but really it's just the stopping factor.
+
+    [Export] private float GRAVITY = -4;
+    [Export] private float JUMP_FORCE = 140;
+
+    private Vector3 motion = Vector3.Zero;
+
+    public override void _Ready() {
+        //TODO: Graphics and Sprite-work
+    }
 
     public override void _PhysicsProcess(float delta) {
-        //Positive values of move_dir indicate a move towards the right.
-        int moveDir = 0;
+        var x_input = Input.GetActionStrength("move_right") - Input.GetActionStrength("move_left");
 
-        if (Input.IsActionPressed("move_right")) {
-            moveDir++;
-        } else if (Input.IsActionPressed("move_left")) {
-            moveDir--;
+        // Defining horizontal motion
+        if (x_input != 0) {
+            //TODO: Play the running animation
+            motion.x += x_input * ACCELERATION * delta * TARGET_FPS;
+            motion.x = Mathf.Clamp(motion.x, -MAX_SPEED, MAX_SPEED);
+            //TODO: Flip the lil guy
         }
 
-        if (moveDir != 0)
-            vel.x = moveDir;
-        
-        //Jumping code
-        bool justJumped = false;
-        bool grounded = IsOnFloor();
-        bool ceilinged = IsOnCeiling();
-        bool walled = IsOnWall();
-        
-        vel.y -= gravity * delta;
-        if (vel.y < -maxFallSpeed) {
-            vel.y = -maxFallSpeed;
-        }
-        
-        if (grounded)
-        {
-            vel.y = -0.01f;
-            if (Input.IsActionPressed("jump"))
-            {
-                justJumped = true;
-                vel.y = jumpForce;
+        // Defining vertical motion
+        motion.y += GRAVITY * delta * TARGET_FPS; // Gravity
+
+        // Jumping - (Defying gravity)
+        if (IsOnFloor()) {
+            if (x_input == 0) motion.x = Mathf.Lerp(motion.x, 0, FRICTION * delta);
+
+            if (Input.IsActionJustPressed("jump")) {
+                motion.y = JUMP_FORCE;
+                Console.WriteLine("Jump pressed");
             }
         }
-            
-        if (ceilinged)      // bang head on ceiling
-            vel.y = 0f;
+        else {
+            // TODO: Play the jump animation
 
-        if (walled)         // bump into wall
-            vel.x = 0f;
+            // DIRTY variable-esc jumping
+            if (Input.IsActionJustReleased("jump") && motion.y > JUMP_FORCE / 2) {
+                motion.y = JUMP_FORCE / 2;
+                Console.WriteLine("Jump released");
+            }
 
-
-        //This just moves the player along a vector... I'm sorry for declaring the vector at runtime but whatever...
-        MoveAndSlide(new Vector3(moveSpeed * vel.x, vel.y, 0), new Vector3(0, 1, 0));
-        
-        // x damping - doesn't matter what moveDir is bc this will be overwritten next call if it's != 0
-        vel.x *= grounded ? xFloorDamping : xAirDamping;
-        vel.x = (float) Math.Round(vel.x, 4);
-
-        // Flip the character. Probably not useful without graphics.
-        // TODO: Fix flip functionality.
-        if (moveDir < 0 && facing_right) {
-            Flip();
+            if (x_input == 0) motion.x = Mathf.Lerp(motion.x, 0, AIR_RESISTANCE * delta);
         }
-        if (moveDir > 0 && !facing_right) {
-            Flip();
-        }
-        
-        // TODO: Animation code.
-    }
 
-    public void Flip() {
-        //TODO: This will need to be updated after graphics are introduced.
-        //var mesh = GetNode<MeshInstance>("CHANGEGRAPHICS");
-        //mesh.RotationDegrees.y *= -1; // Rotates 180 degrees
-        facing_right = !facing_right;
+        motion = MoveAndSlide(new Vector3(motion), new Vector3(0, 1, 0));
     }
-    
-    public override void _Ready()
-    {
-        
-    }
-
-
 }
