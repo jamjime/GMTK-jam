@@ -32,11 +32,14 @@ public class Player : KinematicBody {
             //TODO: Play the running animation
             motion.x += x_input * ACCELERATION * delta * TARGET_FPS;
             motion.x = Mathf.Clamp(motion.x, -MAX_SPEED, MAX_SPEED);
-            sprite.FlipH = x_input < 0; //Proud of this.
+            sprite.FlipH = x_input < 0; //Proud of this. <3333
         }
         else {
             sprite.Play("idle");
         }
+
+        if (IsOnFloor())        // play idle animation after landing
+            sprite.Play("idle");
 
         // Defining vertical motion
         motion.y += GRAVITY * delta * TARGET_FPS; // Gravity
@@ -47,7 +50,7 @@ public class Player : KinematicBody {
 
             if (Input.IsActionJustPressed("jump")) {
                 motion.y = JUMP_FORCE;
-                Console.WriteLine("Jump pressed");
+                //Console.WriteLine("Jump pressed");
             }
         }
         else {
@@ -56,7 +59,7 @@ public class Player : KinematicBody {
             // DIRTY variable-esc jumping
             if (Input.IsActionJustReleased("jump") && motion.y > JUMP_FORCE / 2) {
                 motion.y = JUMP_FORCE / 2;
-                Console.WriteLine("Jump released");
+                //Console.WriteLine("Jump released");
             }
 
             if (x_input == 0) motion.x = Mathf.Lerp(motion.x, 0, AIR_RESISTANCE * delta);
